@@ -1,0 +1,51 @@
+from django.urls import path
+
+from core.error_views import service_unavailable_demo, unauthorized_demo
+from core.frontend_views import (
+    admin_panel_page,
+    aml_page,
+    article_detail_page,
+    articles_page,
+    cabinet_page,
+    cities_page,
+    create_order_page,
+    home_page,
+    latest_reviews_partial,
+    leave_review_page,
+    legal_page,
+    logout_page,
+    order_detail_page,
+    rates_partial,
+    register_page,
+    reviews_page,
+    rules_page,
+    track_order,
+)
+from core.manager_views import manager_cancel, manager_complete, manager_desk, manager_take
+
+urlpatterns = [
+    path("", home_page, name="home"),
+    path("cities/", cities_page, name="cities-page"),
+    path("track/", track_order, name="track-order"),
+    path("auth/register/", register_page, name="register"),
+    path("auth/logout/", logout_page, name="auth-logout"),
+    path("reviews/", reviews_page, name="reviews-page"),
+    path("cabinet/", cabinet_page, name="cabinet"),
+    path("cabinet/create-order/", create_order_page, name="create-order"),
+    path("cabinet/order/<str:public_id>/", order_detail_page, name="order-detail"),
+    path("cabinet/order/<str:public_id>/review/", leave_review_page, name="order-review"),
+    path("admin-panel/", admin_panel_page, name="admin-panel"),
+    path("manager/", manager_desk, name="manager-desk"),
+    path("manager/order/<int:pk>/take/", manager_take, name="manager-take"),
+    path("manager/order/<int:pk>/complete/", manager_complete, name="manager-complete"),
+    path("manager/order/<int:pk>/cancel/", manager_cancel, name="manager-cancel"),
+    path("articles/", articles_page, name="articles-page"),
+    path("articles/<int:pk>/", article_detail_page, name="article-detail"),
+    path("aml/", aml_page, name="aml-page"),
+    path("service-rules/", rules_page, name="rules-page"),
+    path("legal/<slug:slug>/", legal_page, name="legal-page"),
+    path("errors/401/", unauthorized_demo, name="error-401-demo"),
+    path("errors/503/", service_unavailable_demo, name="error-503-demo"),
+    path("partials/rates/", rates_partial, name="rates-partial"),
+    path("partials/latest-reviews/", latest_reviews_partial, name="latest-reviews-partial"),
+]

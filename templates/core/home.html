@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Главная - INS Exchange{% endblock %}
+{% block content %}
+<section class="hero hero-decor">
+    {% if marquee_pairs %}
+    <div class="hero-decor__marquee" aria-label="Актуальные направления обмена">
+        <div class="hero-decor__marquee-viewport">
+            <div class="hero-decor__marquee-track">
+                <div class="hero-decor__marquee-content">
+                    {% for pair in marquee_pairs %}<span class="hero-decor__marquee-pair">{{ pair }}</span>{% endfor %}
+                </div>
+                <div class="hero-decor__marquee-content" aria-hidden="true">
+                    {% for pair in marquee_pairs %}<span class="hero-decor__marquee-pair">{{ pair }}</span>{% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="hero-decor__marquee-line" aria-hidden="true"></div>
+    </div>
+    {% endif %}
+</section>
+
+<section class="card calculator-card">
+    <h2>Калькулятор обмена</h2>
+    {% if not user.is_authenticated %}
+        <p class="muted">Для создания заявки нужно войти в аккаунт.</p>
+    {% endif %}
+    <form method="post" id="exchange-form" class="form">
+        {% csrf_token %}
+        <div class="calc-grid">
+            <div>
+                <label>Город</label>
+                {{ calculator_form.city }}
+            </div>
+            <div>
+                <label>Вы отправляете</label>
+                {{ calculator_form.send_currency }}
+                {{ calculator_form.send_amount }}
+            </div>
+            <div>
+                <label>Вы получаете</label>
+                {{ calculator_form.receive_currency }}
+                {{ calculator_form.receive_amount }}
+            </div>
+        </div>
+        <div class="calc-grid">
+            <div>
+                <label>Телефон</label>
+                {{ calculator_form.contact_phone }}
+            </div>
+            <div style="grid-column: span 2;">
+                <label>Комментарий</label>
+                {{ calculator_form.comment }}
+            </div>
+        </div>
+        {{ calculator_form.rate_id }}
+        {{ calculator_form.entry_mode }}
+        <p id="stale-warning" class="muted" style="display:none;">Используется устаревший курс (API временно недоступен).</p>
+        <button class="btn" type="submit" {% if not user.is_authenticated %}disabled{% endif %}>Обменять</button>
+    </form>
+</section>
+
+<section class="card">
+    <h2>Текущие курсы по всем парам</h2>
+    <p class="muted">Курсы обновляются автоматически (таблица перезагружается ~каждые 45 с). Метка «устарел» — если запись в базе не обновлялась более 10 минут (см. время в колонке). Город на курс не влияет.</p>
+    <div
+        id="rates-table"
+        hx-get="{% url 'rates-partial' %}"
+        hx-trigger="load, every 45s"
+        hx-swap="innerHTML"
+    >
+        {% include "core/partials/rates_table.html" with rates=rates stale_before=stale_before %}
+    </div>
+</section>
+
+<section class="card">
+    <h2>Города и офисы</h2>
+    <p><a href="{% url 'cities-page' %}">Полный список городов и адресов</a></p>
+    <div class="chips">
+        {% for city in cities_preview %}
+            <span class="chip">{{ city.name }}</span>
+        {% empty %}
+            <span>Города добавляются администратором.</span>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="card">
+    <h2>Последние 5 отзывов</h2>
+    <div
+        id="latest-reviews"
+        hx-get="{% url 'latest-reviews-partial' %}"
+        hx-trigger="load, every 60s"
+        hx-swap="innerHTML"
+    >
+        {% include "core/partials/latest_reviews.html" with latest_reviews=latest_reviews %}
+    </div>
+</section>
+{{ rate_options|json_script:"rate-options-data" }}
+<script>
+(() => {
+  const form = document.getElementById("exchange-form");
+  if (!form) return;
+  const rates = JSON.parse(document.getElementById("rate-options-data").textContent || "[]");
+  const sendCurrency = form.querySelector("[name='send_currency']");
+  const receiveCurrency = form.querySelector("[name='receive_currency']");
+  const sendAmount = form.querySelector("[name='send_amount']");
+  const receiveAmount = form.querySelector("[name='receive_amount']");
+  const rateId = form.querySelector("[name='rate_id']");
+  const entryMode = form.querySelector("[name='entry_mode']");
+  const staleWarning = document.getElementById("stale-warning");
+
+  const findRate = () => rates.find(r => r.base === sendCurrency.value && r.quote === receiveCurrency.value);
+
+  const rateSell = (r) => parseFloat(r.sell);
+
+  const applyRate = () => {
+    const r = findRate();
+    if (!r) {
+      rateId.value = "";
+      staleWarning.style.display = "none";
+      return null;
+    }
+    rateId.value = r.id;
+    staleWarning.style.display = r.is_stale ? "block" : "none";
+    return r;
+  };
+
+  const recvDecimals = (r) => (r.quote_is_crypto ? 8 : 2);
+  const sendDecimals = (r) => (r.base_is_crypto ? 8 : 2);
+
+  const recalcFromSend = () => {
+    const r = applyRate();
+    if (!r) {
+      receiveAmount.value = "";
+      return;
+    }
+    const s = parseFloat(String(sendAmount.value || "").replace(",", "."), 10);
+    const sell = rateSell(r);
+    if (!(s > 0) || !(sell > 0)) return;
+    receiveAmount.value = (s * sell).toFixed(recvDecimals(r));
+    entryMode.value = "send";
+  };
+
+  const recalcFromReceive = () => {
+    const r = applyRate();
+    if (!r) {
+      sendAmount.value = "";
+      return;
+    }
+    const recv = parseFloat(String(receiveAmount.value || "").replace(",", "."), 10);
+    const sell = rateSell(r);
+    if (!(recv > 0) || !(sell > 0)) return;
+    sendAmount.value = (recv / sell).toFixed(sendDecimals(r));
+    entryMode.value = "receive";
+  };
+
+  sendCurrency.addEventListener("change", recalcFromSend);
+  receiveCurrency.addEventListener("change", recalcFromSend);
+  sendAmount.addEventListener("input", recalcFromSend);
+  receiveAmount.addEventListener("input", recalcFromReceive);
+  applyRate();
+  recalcFromSend();
+})();
+</script>
+{% endblock %}

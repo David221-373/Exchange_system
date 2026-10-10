@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<h1>{{ page_title }}</h1>
+{% if revision %}
+<div class="card legal-body">
+    {{ body|linebreaks }}
+</div>
+<p class="muted small-print">Последнее обновление: {{ revision.created_at|date:"d.m.Y H:i" }}{% if revision.author %} · {{ revision.author.username }}{% endif %}</p>
+{% else %}
+<div class="card">
+    <p>Текст ещё не опубликован. Администратор может добавить его в админке: модель «Юридическая страница».</p>
+</div>
+{% endif %}
+{% endblock %}

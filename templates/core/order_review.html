@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Отзыв по заявке {{ order.public_id }}{% endblock %}
+{% block content %}
+<h1>Отзыв по заявке {{ order.public_id }}</h1>
+<form method="post" class="card form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">Отправить отзыв</button>
+</form>
+<p><a href="{% url 'order-detail' public_id=order.public_id %}">Отмена</a></p>
+{% endblock %}

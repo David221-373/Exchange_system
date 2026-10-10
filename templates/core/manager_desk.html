@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Панель менеджера{% endblock %}
+{% block content %}
+<h1>Обработка заявок</h1>
+<p>Статусы назначает менеджер: взять новую заявку, вести до завершения или отменить. Телефон и e-mail берутся из заявки; если в заявке не указаны — из профиля клиента в системе.</p>
+
+<section class="card">
+    <h2>Новые <span class="badge-warn">!</span></h2>
+    <div class="table-scroll">{% include "core/partials/manager_order_table.html" with orders=new_orders show_take=1 %}</div>
+</section>
+
+<section class="card">
+    <h2>В обработке</h2>
+    <div class="table-scroll">{% include "core/partials/manager_order_table.html" with orders=in_progress show_actions=1 %}</div>
+</section>
+
+<section class="card muted-section">
+    <h2>Последние исполненные</h2>
+    <div class="table-scroll">{% include "core/partials/manager_order_table.html" with orders=done_orders show_actions=0 %}</div>
+</section>
+
+<section class="card muted-section">
+    <h2>Отменённые</h2>
+    <div class="table-scroll">{% include "core/partials/manager_order_table.html" with orders=canceled_orders show_actions=0 %}</div>
+</section>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<h1>Личный кабинет</h1>
+{% if user.role == "client" %}
+    <p><a class="btn btn-secondary" href="{% url 'track-order' %}">Проверить статус</a></p>
+{% endif %}
+
+<section class="card orders-section">
+    <h2>Заявки</h2>
+    <p class="muted small-print">Список заявок в таблице; при узком экране появится горизонтальная прокрутка.</p>
+    <div class="table-scroll">
+        <table class="table table-striped orders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Направление</th>
+                    <th>Статус</th>
+                    <th>Сумма</th>
+                    <th>Город</th>
+                    <th>Создано</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td><strong>{{ order.public_id }}</strong></td>
+                    <td>{{ order.direction_label }}</td>
+                    <td><span class="order-status order-status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td class="numeric">{{ order.crypto_amount }} → {{ order.total_amount }}</td>
+                    <td>{% if order.city %}{{ order.city.name }}{% else %}—{% endif %}</td>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        {% if user.role == "client" %}
+                            <a href="{% url 'order-detail' public_id=order.public_id %}">Подробнее</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Заявок пока нет.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

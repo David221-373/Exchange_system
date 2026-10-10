@@ -1,0 +1,39 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Направление</th>
+            <th>Тип</th>
+            <th>Динамика</th>
+            <th>Покупка</th>
+            <th>Продажа</th>
+            <th>Обновлено</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for rate in rates %}
+        <tr>
+            <td>{{ rate.base_currency.code }} → {{ rate.quote_currency.code }}</td>
+            <td>{{ rate.get_direction_type_display }}</td>
+            <td>
+                {% if rate.trend == "up" %}
+                    <span class="trend-indicator trend-indicator-up" title="Рост">{{ "▲ " }}{{ rate.trend_percent }}</span>
+                {% elif rate.trend == "down" %}
+                    <span class="trend-indicator trend-indicator-down" title="Падение">{{ "▼ " }}{{ rate.trend_percent }}</span>
+                {% else %}
+                    <span class="trend-indicator trend-indicator-flat" title="Без изменений">■ 0.00%</span>
+                {% endif %}
+            </td>
+            <td class="numeric">{{ rate.buy_rate }}</td>
+            <td class="numeric">{{ rate.sell_rate }}</td>
+            <td>
+                {{ rate.updated_at|date:"d.m.Y H:i:s" }}
+                {% if stale_before and rate.updated_at < stale_before %}
+                    <span class="badge-warn">устарел</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="6">Курсы пока не заполнены</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

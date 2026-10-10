@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<article class="card">
+    <h1>{{ article.title }}</h1>
+    <p><small>{{ article.published_at|date:"d.m.Y H:i" }} | {{ article.author.username }}</small></p>
+    <p>{{ article.text|linebreaks }}</p>
+</article>
+{% endblock %}

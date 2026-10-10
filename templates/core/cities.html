@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Города и офисы{% endblock %}
+{% block content %}
+<h1>Города и офисы</h1>
+<p>Город в заявке указывается для справки; обработка онлайн, офлайн-часть — в офисе по информации менеджера.</p>
+<div class="cities-grid">
+{% for city in cities %}
+    <article class="card city-card">
+        <h3>{{ city.name }}</h3>
+        {% if city.address %}<p class="address">{{ city.address }}</p>{% else %}<p class="muted">Адрес уточняется.</p>{% endif %}
+    </article>
+{% empty %}
+    <p>Список городов пока пуст.</p>
+{% endfor %}
+</div>
+{% endblock %}

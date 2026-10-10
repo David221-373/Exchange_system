@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Статус заявки{% endblock %}
+{% block content %}
+<h1>Статус заявки по номеру</h1>
+<form method="get" class="card form track-form">
+    <label for="id">Номер заявки</label>
+    <input id="id" name="id" type="text" placeholder="INS-YYYYMMDD-XXXXX" value="{{ public_id_query }}">
+    <button class="btn" type="submit">Найти</button>
+</form>
+
+{% if public_id_query and not order %}
+    <div class="message">Заявка с таким номером не найдена.</div>
+{% endif %}
+
+{% if order %}
+<section class="card track-result-card orders-section">
+    <h2>Результат: {{ order.public_id }}</h2>
+    <div class="table-scroll">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Параметр</th>
+                    <th>Значение</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Номер</th>
+                    <td><strong>{{ order.public_id }}</strong></td>
+                </tr>
+                <tr>
+                    <th scope="row">Направление</th>
+                    <td>{{ order.direction_label }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Статус</th>
+                    <td><span class="order-status order-status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                </tr>
+                <tr>
+                    <th scope="row">Создана</th>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% if show_sensitive %}
+                <tr>
+                    <th scope="row">Сумма</th>
+                    <td class="numeric">{{ order.crypto_amount }} (отправляете) → {{ order.total_amount }} (получаете)</td>
+                </tr>
+                <tr>
+                    <th scope="row">Курс (снимок)</th>
+                    <td class="numeric">покупка {{ order.rate_buy_snapshot }}, продажа {{ order.rate_sell_snapshot }}</td>
+                </tr>
+                {% if order.city %}
+                <tr>
+                    <th scope="row">Город</th>
+                    <td>{{ order.city.name }}</td>
+                </tr>
+                {% endif %}
+                {% if order.contact_email %}
+                <tr>
+                    <th scope="row">E-mail</th>
+                    <td><a href="mailto:{{ order.contact_email }}">{{ order.contact_email }}</a></td>
+                </tr>
+                {% endif %}
+                {% if order.contact_phone %}
+                <tr>
+                    <th scope="row">Телефон</th>
+                    <td><a href="tel:{{ order.contact_phone }}">{{ order.contact_phone }}</a></td>
+                </tr>
+                {% endif %}
+                {% if order.comment %}
+                <tr>
+                    <th scope="row">Комментарий</th>
+                    <td>{{ order.comment }}</td>
+                </tr>
+                {% endif %}
+                {% else %}
+                <tr>
+                    <th scope="row">Подробности</th>
+                    <td class="muted">Видны автору заявки после входа в личный кабинет.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    {% if user.is_authenticated and user.role == "client" %}
+        <p class="muted small-print" style="margin-top:16px;"><a href="{% url 'cabinet' %}">← Все заявки в личном кабинете</a></p>
+    {% endif %}
+</section>
+{% endif %}
+{% endblock %}

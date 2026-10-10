@@ -1,0 +1,62 @@
+<table class="table manager-orders-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Клиент</th>
+            <th>Телефон</th>
+            <th>E-mail</th>
+            <th>Направление</th>
+            <th>Сумма</th>
+            <th>Город</th>
+            <th>Комментарий</th>
+            <th>Статус</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.public_id }}</td>
+            <td>{{ order.client.username }}</td>
+            <td>
+                {% with phone=order.contact_phone|default:order.client.phone %}
+                    {% if phone %}
+                        <a href="tel:{{ phone }}">{{ phone }}</a>
+                    {% else %}—{% endif %}
+                {% endwith %}
+            </td>
+            <td>
+                {% with email=order.contact_email|default:order.client.email %}
+                    {% if email %}
+                        <a href="mailto:{{ email }}">{{ email }}</a>
+                    {% else %}—{% endif %}
+                {% endwith %}
+            </td>
+            <td>{{ order.direction_label }}</td>
+            <td class="numeric">{{ order.crypto_amount }} → {{ order.total_amount }}</td>
+            <td>{% if order.city %}{{ order.city.name }}{% else %}—{% endif %}</td>
+            <td class="comment-cell" title="{{ order.comment }}">{% if order.comment %}{{ order.comment|truncatechars:48 }}{% else %}—{% endif %}</td>
+            <td>{{ order.get_status_display }}</td>
+            <td class="actions-cell">
+                {% if show_take %}
+                    <form method="post" action="{% url 'manager-take' order.pk %}" style="display:inline;">{% csrf_token %}
+                        <button class="btn btn-sm" type="submit">Взять в работу</button>
+                    </form>
+                    <form method="post" action="{% url 'manager-cancel' order.pk %}" style="display:inline;">{% csrf_token %}
+                        <button class="btn btn-sm btn-danger" type="submit">Отменить</button>
+                    </form>
+                {% elif show_actions %}
+                    <form method="post" action="{% url 'manager-complete' order.pk %}" style="display:inline;">{% csrf_token %}
+                        <button class="btn btn-sm" type="submit">Завершить</button>
+                    </form>
+                    <form method="post" action="{% url 'manager-cancel' order.pk %}" style="display:inline;">{% csrf_token %}
+                        <button class="btn btn-sm btn-danger" type="submit">Отменить</button>
+                    </form>
+                {% else %}—{% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="10">Нет заявок</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

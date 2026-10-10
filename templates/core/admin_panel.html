@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Админ панель{% endblock %}
+{% block content %}
+<h1>Админ панель</h1>
+<div class="stats">
+    <div class="card kpi-card"><h3>Новые заявки <span class="micro-indicator micro-indicator-{{ new_orders_trend }}" title="Сравнение с предыдущими 24 часами"></span></h3><p class="kpi-value">{{ new_orders }}</p></div>
+    <div class="card kpi-card"><h3>В работе <span class="micro-indicator micro-indicator-{{ orders_in_progress_trend }}" title="Сравнение с предыдущими 24 часами"></span></h3><p class="kpi-value">{{ orders_in_progress }}</p></div>
+    <div class="card kpi-card"><h3>Отзывы <span class="micro-indicator micro-indicator-{{ reviews_count_trend }}" title="Сравнение с предыдущими 24 часами"></span></h3><p class="kpi-value">{{ reviews_count }}</p></div>
+    <div class="card kpi-card"><h3>Статьи <span class="micro-indicator micro-indicator-{{ published_articles_trend }}" title="Сравнение с предыдущими 24 часами"></span></h3><p class="kpi-value">{{ published_articles }}</p></div>
+</div>
+<p><a class="btn" href="/admin/">Перейти в Django Admin</a></p>
+{% endblock %}

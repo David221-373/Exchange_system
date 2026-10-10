@@ -1,0 +1,9 @@
+{% for review in latest_reviews %}
+    <article class="review">
+        <strong>{{ review.client.username }}</strong>
+        <span class="score">Оценка: {{ review.score }}/5</span>
+        <p>{{ review.text|default:"Без комментария" }}</p>
+    </article>
+{% empty %}
+    <p>Отзывов пока нет.</p>
+{% endfor %}

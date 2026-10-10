@@ -1,0 +1,98 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Crypto Exchange{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="site-body">
+<header class="header">
+    <div class="container nav">
+        <a href="{% url 'home' %}" class="logo">INS Exchange</a>
+        <nav>
+            <a href="{% url 'home' %}">Главная</a>
+            <a href="{% url 'track-order' %}">Статус заявки</a>
+            <a href="{% url 'cities-page' %}">Офисы</a>
+            <a href="{% url 'reviews-page' %}">Отзывы</a>
+            <a href="{% url 'articles-page' %}">Статьи</a>
+            <a href="{% url 'aml-page' %}">AML</a>
+            <a href="{% url 'rules-page' %}">Правила</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'cabinet' %}">ЛК</a>
+                {% if user.role == 'manager' %}<a href="{% url 'manager-desk' %}">Менеджер</a>{% endif %}
+                {% if user.role == 'admin' %}<a href="{% url 'admin-panel' %}">Админ панель</a>{% endif %}
+                <a href="{% url 'auth-logout' %}">Выход</a>
+            {% else %}
+                <a href="{% url 'auth-login' %}">Вход</a>
+                <a href="{% url 'register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+<main class="container">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <div class="footer-brand">
+            <a href="{% url 'home' %}" class="footer-logo">INS Exchange</a>
+            <p class="footer-tagline">Информационная система обменного центра. Пример описания: обмен наличных и крипты, прозрачные курсы и поддержка клиентов.</p>
+        </div>
+        <div class="footer-col">
+            <h3 class="footer-heading">Навигация</h3>
+            <ul class="footer-links">
+                <li><a href="{% url 'home' %}">Главная</a></li>
+                <li><a href="{% url 'cities-page' %}">Офисы</a></li>
+                <li><a href="{% url 'track-order' %}">Статус заявки</a></li>
+                <li><a href="{% url 'reviews-page' %}">Отзывы</a></li>
+                <li><a href="{% url 'articles-page' %}">Статьи</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h3 class="footer-heading">Контакты (пример)</h3>
+            <ul class="footer-contact">
+                <li><span class="footer-label">Телефон</span> <a href="tel:+78001234567">+7 (800) 123-45-67</a></li>
+                <li><span class="footer-label">E-mail</span> <a href="mailto:support@example.com">support@example.com</a></li>
+                <li><span class="footer-label">Адрес</span> г. Example, ул. Примерная, д. 1, офис 100</li>
+                <li><span class="footer-label">Часы</span> Пн–Пт 10:00–19:00 (пример)</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h3 class="footer-heading">Документы</h3>
+            <ul class="footer-links">
+                {% for lp in footer_legal_pages %}
+                    <li><a href="{% url 'legal-page' slug=lp.slug %}">{{ lp.title }}</a></li>
+                {% empty %}
+                    <li><a href="{% url 'aml-page' %}">AML / KYC</a></li>
+                    <li><a href="{% url 'rules-page' %}">Правила сервиса</a></li>
+                {% endfor %}
+            </ul>
+            <p class="footer-note">Реквизиты и лицензии — пример: ООО «Example», ИНН 0000000000.</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="container footer-bottom-inner">
+            <p class="footer-copy">© {% now "Y" %} INS Exchange. Демо-данные для дипломного проекта.</p>
+            <p class="footer-disclaimer">Курсы носят информационный характер. Уточняйте условия в офисе.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

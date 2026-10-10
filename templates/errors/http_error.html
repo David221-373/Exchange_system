@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} — {{ title }}{% endblock %}
+{% block content %}
+<section class="card error-card">
+    <p class="error-code" aria-hidden="true">{{ code }}</p>
+    <h1 class="error-title">{{ title }}</h1>
+    <p class="error-subtitle muted">{{ subtitle }}</p>
+    <div class="error-actions">
+        <a class="btn" href="{% url 'home' %}">На главную</a>
+        {% if code == 401 %}
+            <a class="btn btn-secondary" href="{% url 'auth-login' %}">Войти</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

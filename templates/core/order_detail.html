@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Заявка {{ order.public_id }}{% endblock %}
+{% block content %}
+<h1>Заявка {{ order.public_id }}</h1>
+<div class="card">
+    <p><strong>Направление:</strong> {{ order.direction_label }}</p>
+    <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+    {% if order.handled_by %}<p><strong>Менеджер:</strong> {{ order.handled_by.username }}</p>{% endif %}
+    <p><strong>Сумма:</strong> {{ order.crypto_amount }} (отправляете) → {{ order.total_amount }} (получаете)</p>
+    <p><strong>Курс (снимок):</strong> покупка {{ order.rate_buy_snapshot }}, продажа {{ order.rate_sell_snapshot }}</p>
+    {% if order.city %}<p><strong>Город:</strong> {{ order.city.name }}</p>{% endif %}
+    {% if order.contact_email %}<p><strong>E-mail:</strong> {{ order.contact_email }}</p>{% endif %}
+    {% if order.contact_phone %}<p><strong>Телефон:</strong> {{ order.contact_phone }}</p>{% endif %}
+    {% if order.comment %}<p><strong>Комментарий:</strong> {{ order.comment }}</p>{% endif %}
+    <p><strong>Создана:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+</div>
+<p><a href="{% url 'track-order' %}?id={{ order.public_id }}" class="btn btn-secondary">Ссылка на отслеживание</a></p>
+{% if can_review %}
+<p><a class="btn" href="{% url 'order-review' public_id=order.public_id %}">Оставить отзыв</a></p>
+{% endif %}
+<p><a href="{% url 'cabinet' %}">← Назад в ЛК</a></p>
+{% endblock %}

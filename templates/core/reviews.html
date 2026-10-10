@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Отзывы{% endblock %}
+{% block content %}
+<h1>Отзывы клиентов</h1>
+{% for review in reviews %}
+    <article class="card review">
+        <h3>{{ review.client.username }}</h3>
+        <p>ID заявки: {{ review.order.public_id }}</p>
+        <p>Оценка: {{ review.score }}/5</p>
+        <p>{{ review.text|default:"Без комментария" }}</p>
+    </article>
+{% empty %}
+    <p>Отзывов пока нет.</p>
+{% endfor %}
+{% endblock %}

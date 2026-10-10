@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Статьи{% endblock %}
+{% block content %}
+<h1>Раздел со статьями</h1>
+{% for article in articles %}
+    <article class="card">
+        <h3><a href="{% url 'article-detail' article.id %}">{{ article.title }}</a></h3>
+        <p>{{ article.text|truncatechars:200 }}</p>
+        <small>{{ article.published_at|date:"d.m.Y H:i" }}</small>
+    </article>
+{% empty %}
+    <p>Статей пока нет.</p>
+{% endfor %}
+{% endblock %}
